@@ -10,7 +10,7 @@ En éternelle reconnaissance à François Jullien pour ses Figures de l'Immanenc
 
 
 # Police "hexagrammes.ttf"
-Cette police contient les caractères spéciaux qui n'apparaissent pas dans certaines liseuses:
+Cette police contient les caractères spéciaux qui n'apparaissent pas dans certaines liseuses: digrammes, trigrammes, hexagrammes.
 
 
 | **Symbole** | **Nom**    | **Code Unicode** | **Nom officiel (Anglais)** |
