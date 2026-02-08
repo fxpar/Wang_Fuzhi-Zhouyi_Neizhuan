@@ -19,7 +19,8 @@ Elle est déjà incluse dans l'epub en téléchargement ci-dessus.
 
 L'outil [Artefact-md-semantic.html](Artefact-md-semantic.html) permet de créer des règles pour isoler les parties du texte markdown et insérer des balises sémantiques et de mise en forme en html. Les expressions régulières (rationnelles) de recherche et remplacement ont été créées par IA.
 
-
+# Licence
+[Creative commons CC-By-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
 
 | **Symbole** | **Nom**    | **Code Unicode** | **Nom officiel (Anglais)** |
 | ----------- | ---------- | ---------------- | -------------------------- |
