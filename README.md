@@ -7,12 +7,18 @@ En éternelle reconnaissance à François Jullien pour ses Figures de l'Immanenc
 * [01a ䷀ 乾 Qián et ䷁ 坤 Kūn](01a.html) → [démo](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/01a.html)
 * [01b de ䷂ 屯 Zhūn à ䷋ 否 Pǐ](01b.html) → [démo](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/01b.html)
 * [02a de ䷌ 同人 tóng rén à ䷓ 觀 Guān](01b.html) → [démo](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/02a.html)
+* [02b de ䷔ 噬嗑 Shìkè à ䷝ 離 Lí](01b.html) → [démo](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/02b.html)
 
 
 # Police "hexagrammes.ttf"
 Cette police contient les caractères spéciaux qui n'apparaissent pas dans certaines liseuses: digrammes, trigrammes, hexagrammes.
 
 Elle est déjà incluse dans l'epub en téléchargement ci-dessus.
+
+# Artefact
+
+L'outil [Artefact-md-semantic.html](Artefact-md-semantic.html) permet de créer des règles pour isoler les parties du texte markdown et insérer des balises sémantiques et de mise en forme en html. Les expressions régulières (rationnelles) de recherche et remplacement ont été créées par IA.
+
 
 
 | **Symbole** | **Nom**    | **Code Unicode** | **Nom officiel (Anglais)** |
