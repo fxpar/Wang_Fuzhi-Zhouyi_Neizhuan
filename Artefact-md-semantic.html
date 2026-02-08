@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Studio Sémantique Yi Jing - Pro</title>
+    <style>
+        :root { --bg: #f0f2f5; --panel: #ffffff; --accent: #2c3e50; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; color: #333; }
+        
+        header { background: var(--accent); color: white; padding: 0.8rem 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .main-container { display: flex; flex: 1; overflow: hidden; padding: 15px; gap: 15px; }
+        
+        .sidebar { width: 300px; display: flex; flex-direction: column; gap: 15px; }
+        .panel { flex: 1; display: flex; flex-direction: column; background: var(--panel); border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
+        .panel-header { padding: 12px; background: #f8f9fa; font-weight: bold; border-bottom: 1px solid #dee2e6; display: flex; justify-content: space-between; align-items: center; }
+        
+        textarea { flex: 1; padding: 15px; border: none; outline: none; font-family: "Fira Code", monospace; font-size: 13px; background: #fafafa; resize: none; }
+        .preview { flex: 1; padding: 20px; overflow-y: auto; background: white; line-height: 1.6; }
+
+        /* Gestion des règles */
+        .rule-item { padding: 8px; border-bottom: 1px solid #eee; display: flex; align-items: center; font-size: 0.85rem; }
+        .rule-item input { margin-right: 10px; }
+        .rule-label { flex: 1; cursor: pointer; }
+
+        /* Styles Sémantiques */
+        .zh { color: #c0392b; font-weight: 600; background: #fff5f5; padding: 0 2px; }
+        .pinyin { color: #d35400; font-style: italic; }
+        .pinyin-citation { color: #d35400; font-style: italic; }
+        .hexa-block { border-left: 4px solid #3498db; padding: 10px 15px; margin: 15px 0; background: #f8fbff; }
+        .hexa-symbol {  color:teal;}
+        blockquote { border-left: 5px solid #bdc3c7; background: #f9f9f9; font-style: italic; display:inline }
+		/* Style pour ton séparateur */
+.section-divider {
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+    width: 50%; /* Optionnel : pour un look plus élégant */
+}
+        
+        .btn { padding: 8px 12px; cursor: pointer; border-radius: 4px; border: none; background: #27ae60; color: white; transition: 0.2s; }
+        .btn:hover { background: #219150; }
+        .btn-secondary { background: #7f8c8d; }
+		
+		
+    </style>
+</head>
+<body>
+
+<header>
+    <div><strong>Wang Fuzhi Semantic Studio</strong></div>
+    <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" onclick="clearStorage()">Réinitialiser</button>
+        <button class="btn" onclick="downloadHTML()">Exporter HTML</button>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="sidebar">
+        <div class="panel">
+            <div class="panel-header">Processeurs Actifs</div>
+            <div id="rulesList" style="overflow-y:auto;">
+                </div>
+        </div>
+        <div style="font-size: 0.75rem; color: #666; padding: 5px;">
+            Note : Les modifications sont appliquées en temps réel et sauvegardées.
+        </div>
+    </div>
+
+    <div class="panel" style="flex: 1.5;">
+        <div class="panel-header">Markdown Source</div>
+        <textarea id="input" placeholder="Collez votre texte ici..."></textarea>
+    </div>
+
+    <div class="panel" style="flex: 2;">
+        <div class="panel-header">Rendu Sémantique</div>
+        <div id="preview" class="preview"></div>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('input');
+    const preview = document.getElementById('preview');
+    const rulesList = document.getElementById('rulesList');
+
+    // Définition des processeurs avec ID et description
+    const rawProcessors = [ 
+	
+		{ 
+			id: 'inline_term', 
+			desc: 'Termes complets avec parenthèses (漢 pinyin)', 
+			active: true, 
+			run: (t) => {
+				// La regex capture :
+				// $1 : Les caractères chinois
+				// $2 : Tout ce qui suit jusqu'à la parenthèse fermante (le pinyin)
+				return t.replace(/\(([\u4e00-\u9fa5\u4dc0-\u4dff]+)\s?([^)]*)\)/g, (match, zh, py) => {
+					// On enveloppe le tout dans la classe "terme"
+					// Le pinyin n'est ajouté que s'il existe dans la parenthèse
+					const pinyinPart = py ? ` <span class="pinyin">${py.trim()}</span>` : '';
+					return `<span class="terme">(<span class="zh" lang="zh">${zh}</span>${pinyinPart})</span>`;
+				});
+			}
+		},
+
+		{
+			id: 'zh_blocks',
+			desc: 'Blocs Chinois avec Ponctuation et Guillemets',
+			active: true,
+			run: (t) => {
+				// Cette regex détecte :
+				// 1. (Optionnel) Un guillemet ouvrant : ["«「《]
+				// 2. Le corps : Séquence de caractères Han, hexagrammes, ponctuation chinoise et espaces
+				// 3. (Optionnel) Un guillemet fermant : ["»」》]
+				const regexBlock = /(["«「《]?([\u4e00-\u9fa5\u4dc0-\u4dff\u3000-\u303f\uff01-\uff0f\uff1a-\uff20\s]+)["»」》]?)/g;
+
+				return t.replace(regexBlock, (match) => {
+					// On vérifie si le match contient vraiment du chinois 
+					// (pour éviter de capturer des blocs d'espaces seuls)
+					if (/[\u4e00-\u9fa5\u4dc0-\u4dff]/.test(match)) {
+						return `<span class="zh" lang="zh">${match.trim()}</span>`;
+					}
+					return match;
+				});
+			}
+		},
+
+
+
+		{ 
+			id: 'hexa', 
+			desc: 'Hexagrammes', 
+			active: true, 
+			run: (t) => t.replace(/([䷀-䷿])\s/g, '<span class="hexa-symbol">$&</span>') 
+		},
+		
+		
+		{ id: 'headers', desc: 'Titres #', active: true, 
+			  run: (t) => t.replace(/^## (.*$)/gim, '<h3>$1</h3>').replace(/^# (.*$)/gim, '<h2>$1</h2>') },
+			  
+			  
+		{
+			id: 'horizontal_rule',
+			desc: 'Séparateur horizontal ---',
+			active: true,
+			run: (t) => {
+				// Détecte 3 tirets ou plus sur une ligne isolée
+				return t.replace(/^(\s*---\s*)$/gm, '<hr class="section-divider">');
+			}
+		},
+	
+		{ id: 'para', desc: 'Paragraphes', active: true, 
+			  run: (t) => t.split('\n\n').map(p => p.trim().startsWith('<') ? p : `<p>${p.replace(/\n/g, '<br>')}</p>`).join('') },
+		
+		{ id: 'bold', desc: 'Gras **...**', active: true, 
+			  run: (t) => t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') },
+
+		{ id: 'italic', desc: 'Italique *...*', active: true, 
+			  run: (t) => t.replace(/\*(.*?)\*/g, '<em>$1</em>') },
+		
+		
+		
+		{
+			id: 'pinyin_citation_block',
+			desc: 'Pinyin de citation (après italique)',
+			active: true,
+			run: (t) => {
+				// Cette regex cherche :
+				// 1. La balise fermante de l'italique </em>
+				// 2. Les sauts de ligne possibles ( \n ou <br> )
+				// 3. Une ligne de texte contenant au moins un accent pinyin
+				// 4. S'arrête avant la balise fermante du paragraphe </p>
+				
+				const pinyinChars = "āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ";
+				const regexCitation = new RegExp(`(<\/em>\\s*(?:<br>|\\n)\\s*)([^<\\n]*[${pinyinChars}][^<\\n]*)(?=\\s*(?:<br>|\\n|<\\/p>))`, 'gi');
+
+				return t.replace(regexCitation, (match, separator, pinyinLine) => {
+					return `${separator}<span class="pinyin-citation">${pinyinLine.trim()}</span>`;
+				});
+			}
+		}
+		
+
+		
+		
+
+	];
+
+    // Initialisation : Charger les données du LocalStorage
+    function init() {
+        const savedText = localStorage.getItem('yj_text');
+        if (savedText) input.value = savedText;
+        
+        renderRulesUI();
+        render();
+    }
+
+    // Créer les cases à cocher pour les règles
+    function renderRulesUI() {
+        rulesList.innerHTML = '';
+        rawProcessors.forEach((rule, index) => {
+            const div = document.createElement('div');
+            div.className = 'rule-item';
+            div.innerHTML = `
+                <input type="checkbox" id="rule-${index}" ${rule.active ? 'checked' : ''} onchange="toggleRule(${index})">
+                <label class="rule-label" for="rule-${index}">${rule.desc}</label>
+            `;
+            rulesList.appendChild(div);
+        });
+    }
+
+    function toggleRule(index) {
+        rawProcessors[index].active = !rawProcessors[index].active;
+        render();
+    }
+
+    function render() {
+        let content = input.value;
+        
+        // Sauvegarde automatique du texte
+        localStorage.setItem('yj_text', content);
+
+        // Appliquer uniquement les règles actives
+        rawProcessors.forEach(rule => {
+            if (rule.active) content = rule.run(content);
+        });
+
+        preview.innerHTML = content;
+    }
+
+    function clearStorage() {
+        if(confirm("Effacer tout le texte sauvegardé ?")) {
+            localStorage.removeItem('yj_text');
+            location.reload();
+        }
+    }
+
+    function downloadHTML() {
+        const fullHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+            body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 20px; }
+            .zh { color: #c0392b; font-weight: bold; }
+            .pinyin { color: #d35400; font-style: italic; }
+            .hexa-block { border-left: 4px solid #3498db; padding: 10px 15px; margin: 15px 0; background: #f8fbff; }
+            blockquote { border-left: 4px solid #eee; padding-left: 20px; color: #444; }
+        </style></head><body>${preview.innerHTML}</body></html>`;
+        
+        const blob = new Blob([fullHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'yijing_export.html';
+        a.click();
+    }
+
+    input.addEventListener('input', render);
+    init();
+</script>
+
+</body>
+</html>
