@@ -15,6 +15,8 @@ Cette police contient les caractères spéciaux qui n'apparaissent pas dans cert
 
 Elle est déjà incluse dans l'epub en téléchargement ci-dessus.
 
+Hegragrammes.ttf est un sous groupe d'élément construit à partir de Noto Sans Symbols 2 (Copyright 2022 The Noto Project Authors https://github.com/notofonts/symbols sous licens SIL Open Font License, Version 1.1 . This license is disponible à : https://openfontlicense.org SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007 )
+
 # Artefact
 
 L'outil [Artefact-md-semantic.html](Artefact-md-semantic.html) permet de créer des règles pour isoler les parties du texte markdown et insérer des balises sémantiques et de mise en forme en html. Les expressions régulières (rationnelles) de recherche et remplacement ont été créées par IA.
