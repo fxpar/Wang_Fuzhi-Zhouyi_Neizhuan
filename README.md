@@ -8,7 +8,7 @@ En éternelle reconnaissance à François Jullien pour ses Figures de l'Immanenc
 * [01b de ䷂ 屯 Zhūn à ䷋ 否 Pǐ](01b.html) → [démo](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/01b.html)
 * [02a de ䷌ 同人 tóng rén à ䷓ 觀 Guān](01b.html) → [démo](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/02a.html)
 * [02b de ䷔ 噬嗑 Shìkè à ䷝ 離 Lí](01b.html) → [démo](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/02b.html)
-* [023 de ䷞ 鹹 Xián à ䷧ 解 Xiè](03a.html) → [démo](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/03a.html)
+* [03a de ䷞ 鹹 Xián à ䷧ 解 Xiè](03a.html) → [démo](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/03a.html)
 
 
 # Police "hexagrammes.ttf"
