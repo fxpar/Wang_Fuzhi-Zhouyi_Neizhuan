@@ -160,7 +160,7 @@
         document.querySelectorAll('.chap-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
-        const url = `https://github.com/fxpar/Wang_Fuzhi-Zhouyi_Neizhuan/raw/refs/heads/main/html-balises/${id}tag.html`;
+        const url = `https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/html-balises/${id}tag.html`;
         try {
             const response = await fetch(url);
             const text = await response.text();
