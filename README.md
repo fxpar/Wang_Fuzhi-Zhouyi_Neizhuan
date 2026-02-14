@@ -1,7 +1,7 @@
 # Wang Fuzhi-Zhouyi Neizhuan
 Traduction du Zhōuyì Nèizhuàn 《周易內傳》 de Wang Fuzhi 王夫之(Wang Chuánshān 船山)
 
-<a href="https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/liseuse.html" class="button pill"> ➡️Essayez la liseuse 📗</a>
+<a href="https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/liseuse.html" class="button pill"> 👉 Essayez la liseuse 👈</a>
 
 En éternelle reconnaissance à François Jullien pour ses Figures de l'Immanence.
 
