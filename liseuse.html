@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analyseur Wang Fuzhi - Zhouyi</title>
+    <title>Zhouyi Neizhuan - Station Mobile</title>
     <style>
         :root {
             --accent: #6366f1;
@@ -11,7 +11,6 @@
             --panel: #1e293b;
             --text: #f1f5f9;
             --border: #334155;
-            /* Couleurs thématiques pour les surbrillances */
             --color-zh: #fcd34d;
             --color-pinyin: #6ee7b7;
             --color-hexa: #f472b6;
@@ -21,120 +20,119 @@
 
         body { font-family: 'Inter', system-ui, sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--text); overflow: hidden; }
         
-        /* Sidebar */
+        /* Sidebar Responsive Logic */
         #sidebar { 
-            width: 380px; background: var(--panel); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.3); z-index: 10;
+            width: 350px; background: var(--panel); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.3); z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Chapitres */
-        .chapter-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 1rem; background: rgba(0,0,0,0.2); }
-        .chap-btn { 
-            background: var(--border); border: 1px solid transparent; color: white; 
-            padding: 8px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: 0.2s;
+        /* Overlay pour mobile */
+        #overlay { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(2px); z-index: 90; 
         }
-        .chap-btn:hover { border-color: var(--accent); }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            #sidebar { position: fixed; height: 100%; transform: translateX(-100%); }
+            #sidebar.open { transform: translateX(0); }
+            #overlay.open { display: block; }
+            #mobile-nav { display: flex !important; }
+        }
+
+        /* Bouton Menu Mobile */
+        #mobile-nav { 
+            display: none; position: fixed; bottom: 20px; right: 20px; 
+            background: var(--accent); color: white; border: none; 
+            width: 60px; height: 60px; border-radius: 50%; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4); z-index: 200;
+            justify-content: center; align-items: center; cursor: pointer;
+        }
+
+        /* Le reste du style (Identique v4) */
+        .chapter-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 1rem; background: rgba(0,0,0,0.2); }
+        .chap-btn { background: var(--border); border: 1px solid transparent; color: white; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
         .chap-btn.active { background: var(--accent); font-weight: bold; }
-
-        #controls { flex: 1; overflow-y: auto; padding: 1.5rem; }
-
-        /* Preview Area */
+        #controls { flex: 1; overflow-y: auto; padding: 1.5rem; scrollbar-width: thin; }
+        .margin-control { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+        .margin-control label { display: block; font-size: 0.7rem; text-transform: uppercase; color: #64748b; margin-bottom: 8px; }
+        input[type="range"] { width: 100%; accent-color: var(--accent); }
         #preview-container { flex: 1; background: #fff; position: relative; }
         #viewer { width: 100%; height: 100%; border: none; }
-
-        /* Custom UI Cards */
-        .item-row { 
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 12px; 
-            border-radius: 12px; margin-bottom: 15px;
-        }
-        .label { font-family: 'Fira Code', monospace; font-size: 0.9rem; color: var(--accent); font-weight: bold; display: block; margin-bottom: 10px;}
-        
-        .switch-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;}
-
-        /* Modern Highlight Buttons */
-        .btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .btn-group button { 
-            background: transparent; border: 1px solid var(--border); color: #94a3b8;
-            padding: 8px 4px; border-radius: 6px; font-size: 0.65rem; cursor: pointer; transition: 0.2s;
-        }
+        .item-row { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 12px; border-radius: 12px; margin-bottom: 12px; }
+        .label { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent); font-weight: bold; }
+        .switch-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+        .switch { position: relative; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background: #475569; transition: .3s; border-radius: 20px; }
+        input:checked + .slider { background: var(--accent); }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        .btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        .btn-group button { background: transparent; border: 1px solid var(--border); color: #94a3b8; padding: 8px 2px; border-radius: 6px; font-size: 0.65rem; cursor: pointer; }
         .btn-group button.active { background: var(--btn-color, var(--accent)); color: white; border-color: white; }
-
-        .btn-save { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border: none; padding: 14px; margin: 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-save { background: var(--accent); color: white; border: none; padding: 14px; margin: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
+<button id="mobile-nav" onclick="toggleSidebar()">
+    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+</button>
+
+<div id="overlay" onclick="toggleSidebar()"></div>
+
 <div id="sidebar">
-    <div style="padding: 1.5rem 1.5rem 0.5rem;">
-        <h2 style="margin: 0; font-size: 1.1rem;">Chapitres GitHub</h2>
-    </div>
+    <div class="chapter-grid" id="chapterGrid"></div>
     
-    <div class="chapter-grid" id="chapterGrid">
-        </div>
+    <div class="margin-control">
+        <label>Marges : <span id="marginVal">15</span>%</label>
+        <input type="range" id="marginSlider" min="0" max="40" value="15" oninput="updateMargins(this.value)">
+    </div>
 
     <div id="controls">
         <div id="ui-zh" class="item-row" style="--btn-color: var(--color-zh)">
             <div class="switch-container">
-                <span class="label">.zh (Texte Chinois)</span>
-                <label class="switch-ui"><input type="checkbox" checked onchange="handleToggle('.zh', this.checked)"> Activé</label>
+                <span class="label">.zh</span>
+                <label class="switch"><input type="checkbox" checked onchange="handleToggle('.zh', this.checked)"><span class="slider"></span></label>
             </div>
-            <div class="btn-group">
-                <button onclick="setHL('.zh', 'none', this)" class="active">Normal</button>
-                <button onclick="setHL('.zh', 'gold', this)">Or Imperial</button>
-                <button onclick="setHL('.zh', 'calligraphy', this)">Calligraphie</button>
-            </div>
+            <div class="btn-group"><button onclick="setHL('.zh', 'none', this)" class="active">Off</button><button onclick="setHL('.zh', 'gold', this)">Or</button><button onclick="setHL('.zh', 'calligraphy', this)">Kaiti</button></div>
         </div>
 
         <div id="ui-pinyin" class="item-row" style="--btn-color: var(--color-pinyin)">
             <div class="switch-container">
                 <span class="label">.pinyin</span>
-                <label class="switch-ui"><input type="checkbox" checked onchange="handleToggle('.pinyin', this.checked)"> Activé</label>
+                <label class="switch"><input type="checkbox" checked onchange="handleToggle('.pinyin', this.checked)"><span class="slider"></span></label>
             </div>
-            <div class="btn-group">
-                <button onclick="setHL('.pinyin', 'none', this)" class="active">Normal</button>
-                <button onclick="setHL('.pinyin', 'soft', this)">Vert Pastel</button>
-                <button onclick="setHL('.pinyin', 'italic', this)">Italique Souligné</button>
-            </div>
+            <div class="btn-group"><button onclick="setHL('.pinyin', 'none', this)" class="active">Off</button><button onclick="setHL('.pinyin', 'soft', this)">Vert</button><button onclick="setHL('.pinyin', 'italic', this)">Ital.</button></div>
         </div>
 
         <div id="ui-hexa" class="item-row" style="--btn-color: var(--color-hexa)">
             <div class="switch-container">
-                <span class="label">.hexa (Hexagrammes)</span>
-                <label class="switch-ui"><input type="checkbox" checked onchange="handleToggle('.hexa', this.checked)"> Activé</label>
+                <span class="label">.hexa</span>
+                <label class="switch"><input type="checkbox" checked onchange="handleToggle('.hexa', this.checked)"><span class="slider"></span></label>
             </div>
-            <div class="btn-group">
-                <button onclick="setHL('.hexa', 'none', this)" class="active">Normal</button>
-                <button onclick="setHL('.hexa', 'box', this)">Cadre Zen</button>
-                <button onclick="setHL('.hexa', 'large', this)">Focus XL</button>
-            </div>
+            <div class="btn-group"><button onclick="setHL('.hexa', 'none', this)" class="active">Off</button><button onclick="setHL('.hexa', 'box', this)">Cadre</button><button onclick="setHL('.hexa', 'large', this)">Grand</button></div>
         </div>
 
         <div id="ui-tri" class="item-row" style="--btn-color: var(--color-tri)">
             <div class="switch-container">
-                <span class="label">.tri (Trigrammes)</span>
-                <label class="switch-ui"><input type="checkbox" checked onchange="handleToggle('.tri', this.checked)"> Activé</label>
+                <span class="label">.tri</span>
+                <label class="switch"><input type="checkbox" checked onchange="handleToggle('.tri', this.checked)"><span class="slider"></span></label>
             </div>
-            <div class="btn-group">
-                <button onclick="setHL('.tri', 'none', this)" class="active">Normal</button>
-                <button onclick="setHL('.tri', 'circle', this)">Cercle Bleu</button>
-                <button onclick="setHL('.tri', 'bold', this)">Gras Indigo</button>
-            </div>
+            <div class="btn-group"><button onclick="setHL('.tri', 'none', this)" class="active">Off</button><button onclick="setHL('.tri', 'circle', this)">Cercle</button><button onclick="setHL('.tri', 'bold', this)">Gras</button></div>
         </div>
 
         <div id="ui-expression" class="item-row" style="--btn-color: var(--color-expr)">
             <div class="switch-container">
                 <span class="label">.expression</span>
-                <label class="switch-ui"><input type="checkbox" checked onchange="handleToggle('.expression', this.checked)"> Activé</label>
+                <label class="switch"><input type="checkbox" checked onchange="handleToggle('.expression', this.checked)"><span class="slider"></span></label>
             </div>
-            <div class="btn-group">
-                <button onclick="setHL('.expression', 'none', this)" class="active">Normal</button>
-                <button onclick="setHL('.expression', 'tint', this)">Fond Sépia</button>
-                <button onclick="setHL('.expression', 'bracket', this)">Crochets Auto</button>
-            </div>
+            <div class="btn-group"><button onclick="setHL('.expression', 'none', this)" class="active">Off</button><button onclick="setHL('.expression', 'tint', this)">Fond</button><button onclick="setHL('.expression', 'bracket', this)">Croch.</button></div>
         </div>
     </div>
-
-    <button class="btn-save" onclick="saveFile()">Exporter HTML + CSS</button>
+    <button class="btn-save" onclick="saveFile()">Exporter</button>
 </div>
 
 <div id="preview-container">
@@ -143,80 +141,83 @@
 
 <script>
     const viewer = document.getElementById('viewer');
-    const chapters = ['00', '1a', '1b', '2a', '2b', '3a', '3b', '4a', '4b', '5a', '5b', '6a', '6b'];
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const chapters = [ '1a', '1b', '2a', '2b', '3a', '3b', '4a', '4b', '5a', '5b', '6a', '6b', '00'];
     let dynamicStyles = {};
+    let currentMargin = 15;
 
-    // 1. Génération des boutons de chapitres
+    // Toggle Sidebar Mobile
+    function toggleSidebar() {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+    }
+
+    // Génération chapitres
     const grid = document.getElementById('chapterGrid');
     chapters.forEach(id => {
         const btn = document.createElement('button');
         btn.className = 'chap-btn';
         btn.textContent = id;
-        btn.onclick = () => loadChapter(id, btn);
+        btn.onclick = () => {
+            loadContent(`https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/html-balises/${id}tag.html`, btn);
+            if(window.innerWidth <= 768) toggleSidebar(); // Ferme le menu sur mobile après clic
+        };
         grid.appendChild(btn);
     });
 
-    async function loadChapter(id, btn) {
-        document.querySelectorAll('.chap-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        const url = `https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/html-balises/${id}tag.html`;
-        try {
-            const response = await fetch(url);
-            const text = await response.text();
-            viewer.srcdoc = text;
-            viewer.onload = () => {
-                const doc = viewer.contentDocument;
-                if (!doc.getElementById('dynamic-styles')) {
-                    const s = doc.createElement('style');
-                    s.id = 'dynamic-styles';
-                    doc.head.appendChild(s);
-                }
-                updateDocStyles();
-            };
-        } catch (e) { alert("Erreur lors du chargement du chapitre."); }
-    }
-
-    // 2. Définition des styles spécifiques par sélecteur
-    const CUSTOM_HIGHLIGHTS = {
-        '.zh': {
-            gold: "color: #b45309 !important; background: #fef3c7 !important; padding: 0 2px; border-radius: 3px;",
-            calligraphy: "font-family: 'Kaiti', serif !important; font-size: 1.2em; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);"
-        },
-        '.pinyin': {
-            soft: "background: #d1fae5 !important; color: #065f46 !important;",
-            italic: "font-style: italic; border-bottom: 1.5px solid #10b981;"
-        },
-        '.hexa': {
-            box: "border: 2px solid #f472b6 !important; padding: 5px; border-radius: 8px; display: inline-block;",
-            large: "font-size: 2em; vertical-align: middle; color: #db2777 !important;"
-        },
-        '.tri': {
-            circle: "background: #dbeafe !important; border-radius: 50%; padding: 4px 8px; color: #1e40af !important;",
-            bold: "font-weight: 900; color: #4338ca !important; text-decoration: underline;"
-        },
-        '.expression': {
-            tint: "background: #ffedd5 !important; border-radius: 4px; padding: 2px 4px;",
-            bracket: "border-left: 3px solid #f97316; border-right: 3px solid #f97316; padding: 0 6px;"
-        }
+    window.onload = () => {
+        const params = new URLSearchParams(window.location.search);
+        const postUrl = params.get('post');
+        postUrl ? loadContent(postUrl) : grid.firstChild.click();
     };
 
-    // 3. Logique de toggle et de caractères (identique avec fix Regex)
+    async function loadContent(url, btn = null) {
+        if (btn) {
+            document.querySelectorAll('.chap-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        try {
+            const r = await fetch(url);
+            viewer.srcdoc = await r.text();
+            viewer.onload = () => {
+                const doc = viewer.contentDocument;
+                const s = doc.createElement('style'); s.id = 'dynamic-styles'; doc.head.appendChild(s);
+                updateMargins(currentMargin);
+                updateDocStyles();
+            };
+        } catch (e) { console.error(e); }
+    }
+
+    function updateMargins(val) {
+        currentMargin = val;
+        document.getElementById('marginVal').textContent = val;
+        if (viewer.contentDocument?.body) {
+            viewer.contentDocument.body.style.paddingLeft = `${val}%`;
+            viewer.contentDocument.body.style.paddingRight = `${val}%`;
+        }
+    }
+
+    // Styles & Logique Parenthèses (Identique v4)
+    const CUSTOM_HIGHLIGHTS = {
+        '.zh': { gold: "color: #b45309 !important; background: #fef3c7 !important; padding: 0 4px; border-radius: 4px;", calligraphy: "font-family: 'Kaiti', serif !important; font-size: 1.2em;" },
+        '.pinyin': { soft: "background: #d1fae5 !important; color: #065f46 !important; padding: 0 4px;", italic: "font-style: italic; border-bottom: 2px solid #10b981;" },
+        '.hexa': { box: "border: 2px solid #f472b6 !important; padding: 4px; border-radius: 6px;", large: "font-size: 2.5em; vertical-align: middle;" },
+        '.tri': { circle: "background: #dbeafe !important; border-radius: 50%; padding: 4px 10px;", bold: "font-weight: 900; color: #1e40af !important;" },
+        '.expression': { tint: "background: #ffedd5 !important; padding: 0 6px;", bracket: "border-left: 4px solid #f97316; border-right: 4px solid #f97316; padding: 0 8px;" }
+    };
+
     function handleToggle(selector, isVisible) {
         const doc = viewer.contentDocument;
-        const reOpen = /([\(《])\s*$/; 
-        const reClose = /^\s*([\拍》])/;
-
+        const reOpen = /([\(《])\s*$/; const reClose = /^\s*([\拍》])/;
         doc.querySelectorAll(selector).forEach(el => {
-            const prev = el.previousSibling;
-            const next = el.nextSibling;
+            const prev = el.previousSibling, next = el.nextSibling;
             if (!isVisible) {
                 if (prev?.nodeType === 3 && next?.nodeType === 3) {
-                    const matchP = prev.textContent.match(reOpen), matchN = next.textContent.match(reClose);
-                    if (matchP && matchN) {
+                    const mP = prev.textContent.match(reOpen), mN = next.textContent.match(reClose);
+                    if (mP && mN) {
                         el.dataset.fullPrev = prev.textContent; el.dataset.fullNext = next.textContent;
-                        prev.textContent = prev.textContent.replace(reOpen, "");
-                        next.textContent = next.textContent.replace(reClose, "");
+                        prev.textContent = prev.textContent.replace(reOpen, ""); next.textContent = next.textContent.replace(reClose, "");
                     }
                 }
             } else if (el.dataset.fullPrev) {
@@ -224,7 +225,6 @@
                 delete el.dataset.fullPrev; delete el.dataset.fullNext;
             }
         });
-
         dynamicStyles[selector] = (dynamicStyles[selector] || "").replace("display: none !important;", "");
         if (!isVisible) dynamicStyles[selector] += "display: none !important;";
         updateDocStyles();
@@ -233,14 +233,9 @@
     function setHL(selector, type, btn) {
         btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        
-        // On garde le display:none si l'élément est désactivé
         const isHidden = (dynamicStyles[selector] || "").includes("display: none");
         dynamicStyles[selector] = isHidden ? "display: none !important;" : "";
-        
-        if (type !== 'none') {
-            dynamicStyles[selector] += CUSTOM_HIGHLIGHTS[selector][type];
-        }
+        if (type !== 'none') dynamicStyles[selector] += CUSTOM_HIGHLIGHTS[selector][type];
         updateDocStyles();
     }
 
@@ -250,18 +245,44 @@
     }
 
     function saveFile() {
-        const clone = viewer.contentDocument.documentElement.cloneNode(true);
-        const styles = clone.querySelector('#dynamic-styles').textContent;
-        const styleTag = document.createElement('style');
-        styleTag.textContent = styles;
-        clone.querySelector('head').appendChild(styleTag);
-        clone.querySelector('#dynamic-styles').remove();
-        const blob = new Blob([clone.outerHTML], {type: 'text/html'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = "wang_fuzhi_export.html";
-        a.click();
+    // 1. On récupère le document entier de l'iframe
+    const sourceDoc = viewer.contentDocument;
+    if (!sourceDoc) return;
+
+    // 2. On clone l'élément racine (html)
+    const cloneHtml = sourceDoc.documentElement.cloneNode(true);
+    
+    // 3. On cible le body et le head à l'intérieur du clone
+    const bodyClone = cloneHtml.querySelector('body');
+    const headClone = cloneHtml.querySelector('head');
+    const dynamicStyleSource = sourceDoc.getElementById('dynamic-styles');
+
+    if (bodyClone) {
+        // Appliquer les marges actuelles en dur
+        bodyClone.style.paddingLeft = `${currentMargin}%`;
+        bodyClone.style.paddingRight = `${currentMargin}%`;
     }
+
+    if (dynamicStyleSource && headClone) {
+        // Créer une balise style propre avec les règles accumulées
+        const finalStyleTag = document.createElement('style');
+        finalStyleTag.textContent = dynamicStyleSource.textContent;
+        headClone.appendChild(finalStyleTag);
+        
+        // Supprimer l'ancienne balise id "dynamic-styles" pour l'export
+        const oldStyle = cloneHtml.querySelector('#dynamic-styles');
+        if (oldStyle) oldStyle.remove();
+    }
+
+    // 4. Génération du fichier
+    const blob = new Blob(['<!DOCTYPE html>\n' + cloneHtml.outerHTML], {type: 'text/html'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "zhouyi_export_final.html";
+    document.body.appendChild(a); // Nécessaire pour certains navigateurs
+    a.click();
+    document.body.removeChild(a);
+}
 </script>
 </body>
 </html>
