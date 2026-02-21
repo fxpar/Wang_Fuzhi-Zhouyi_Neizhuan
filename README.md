@@ -12,6 +12,7 @@ En éternelle reconnaissance à François Jullien pour ses Figures de l'Immanenc
 * 02b de ䷔ 噬嗑 Shìkè à ䷝ 離 Lí [code](./français/html-simple/01b.html) → [web simple](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/français/html-simple/02b.html) → [👉liseuse](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/liseuse.html?post=https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhua/françaisn/html-balises/2btag.html)
 * 03a de ䷞ 鹹 Xián à ䷧ 解 Xiè [code](./français/html-simple/03a.html) → [web simple](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/français/html-simple/03a.html) → [👉liseuse](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/liseuse.html?post=https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/français/html-balises/3atag.html)
 * 03b de ䷨ 損 Sǔn à ䷯ 井 Jǐng [code](./français/html-simple/03b.html) → [web simple](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/français/html-simple/03b.html) → [👉liseuse](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/liseuse.html?post=https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/français/html-balises/3btag.html)
+* 04a de ䷰ 革 Gé à ䷷ 旅 Lǚ [code](./français/html-simple/04a.html) → [web simple](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/français/html-simple/04a.html) → [👉liseuse](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/liseuse.html?post=https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/français/html-balises/4atag.html)
 
 
 # Police "hexagrammes.ttf"
