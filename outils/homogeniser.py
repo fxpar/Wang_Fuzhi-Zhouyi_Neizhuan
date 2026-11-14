@@ -400,6 +400,8 @@ def convert(src, dst, rpt, skip=None, variants=()):
         pass
     text = '\n'.join(out).rstrip() + '\n'
     text = re.sub(r'\n{3,}', '\n\n', text)
+    # pas de '---' en tete : GitHub Pages (Jekyll) le prendrait pour un en-tete YAML
+    text = re.sub(r'\A(?:\s*---[ \t]*\n)+\s*', '', text)
     open(dst, 'w', encoding='utf-8', newline='\n').write(text)
 
     with open(rpt, 'w', encoding='utf-8') as r:
