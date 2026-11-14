@@ -1,0 +1,22 @@
+Source : _archives/markdown-v1/4a.md
+Sortie : français/markdown/4a.md
+
+annotation                 1737
+annotation_avec_glose      93
+fusion_py                  111
+ligne_fr                   649
+ligne_py                   461
+segment_comm               345
+segment_jing               117
+segment_note               187
+terme                      68
+terme_zh                   103
+terme_zh_py                2
+variante                   2
+
+Cas a verifier (5)
+ligne    23  pinyin sans ton          {zh:離 | py:le Feu}
+ligne   364  pinyin sans ton          {sy:䷝ | py:le Feu}
+ligne  1143  pinyin sans ton          {zh:離 | py:le Feu}
+ligne  2211  pinyin sans ton          {zh:主 | py:hôte}
+ligne  2347  pinyin sans ton          {zh:離 | py:le Feu}

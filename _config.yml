@@ -1,0 +1,4 @@
+# GitHub Pages (Jekyll) ignore par defaut les dossiers commençant par "_" :
+# on publie explicitement les archives (ancienne liseuse, textes d'origine).
+include:
+  - _archives

@@ -1,288 +1,391 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zhouyi Neizhuan - Station Mobile</title>
-    <style>
-        :root {
-            --accent: #6366f1;
-            --bg: #0f172a;
-            --panel: #1e293b;
-            --text: #f1f5f9;
-            --border: #334155;
-            --color-zh: #fcd34d;
-            --color-pinyin: #6ee7b7;
-            --color-hexa: #f472b6;
-            --color-tri: #93c5fd;
-            --color-expr: #fb923c;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zhouyi Neizhuan · Liseuse</title>
+<style>
+@font-face { font-family: "Hexagrammes"; src: url("hexagrammes.ttf"); }
+:root {
+  --bg: #fbfaf7; --panel: #f1eee7; --text: #2a2622; --muted: #7a7166; --line: #ddd6ca;
+  --accent: #8a3b12;
+  --c-zh: #a3261b; --c-py: #2d6a4f; --c-sy: #1d5f8a; --c-fr: #6b5e4f;
+  --hl-zh: #fbe3df; --hl-py: #dcefe4; --hl-sy: #dbe9f4; --hl-fr: #eee8dd;
+  --jing-bg: #f4ede0; --card: #faf8f3;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1b1916; --panel: #24211d; --text: #ece6dc; --muted: #9c9285; --line: #3a352e;
+  --accent: #e0915f;
+  --c-zh: #f08b7f; --c-py: #7fcfa3; --c-sy: #8cc3ec; --c-fr: #c9b9a3;
+  --hl-zh: #4a2622; --hl-py: #1f3d2e; --hl-sy: #1f3447; --hl-fr: #3a342b;
+  --jing-bg: #2b2620; --card: #2c2823;
+}}
+:root[data-theme="dark"] {
+  --bg: #1b1916; --panel: #24211d; --text: #ece6dc; --muted: #9c9285; --line: #3a352e;
+  --accent: #e0915f;
+  --c-zh: #f08b7f; --c-py: #7fcfa3; --c-sy: #8cc3ec; --c-fr: #c9b9a3;
+  --hl-zh: #4a2622; --hl-py: #1f3d2e; --hl-sy: #1f3447; --hl-fr: #3a342b;
+  --jing-bg: #2b2620; --card: #2c2823;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--text); font: 17px/1.65 Cambria, "Noto Serif", "Times New Roman", serif; display: flex; }
+/* ---------- barre latérale ---------- */
+#side { width: 310px; flex: none; background: var(--panel); border-right: 1px solid var(--line); height: 100vh; overflow-y: auto; padding: 16px 14px 32px; font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; scrollbar-width: thin; }
+#side h2 { font-size: 11px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 22px 4px 8px; }
+#side h2:first-child { margin-top: 4px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 4px 12px; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 40px; }
+.card > .row + .row, .term + .term { border-top: 1px solid var(--line); }
+.row > label { display: flex; align-items: center; gap: 9px; cursor: pointer; flex: 1; }
+.dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.hint { color: var(--muted); font-size: 12px; }
+.term { padding: 6px 0 10px; }
+.term .row { min-height: 34px; }
 
-        body { font-family: 'Inter', system-ui, sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--text); overflow: hidden; }
-        
-        /* Sidebar Responsive Logic */
-        #sidebar { 
-            width: 350px; background: var(--panel); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.3); z-index: 100;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+/* interrupteurs */
+input.switch { appearance: none; -webkit-appearance: none; margin: 0; flex: none; width: 36px; height: 21px; border-radius: 999px; background: var(--line); position: relative; cursor: pointer; transition: background .2s; }
+input.switch::before { content: ""; position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .2s; }
+input.switch:checked { background: var(--accent); }
+input.switch:checked::before { transform: translateX(15px); }
+input.switch:focus-visible, .pill button:focus-visible, .chaps button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-        /* Overlay pour mobile */
-        #overlay { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
-            backdrop-filter: blur(2px); z-index: 90; 
-        }
+/* boutons segmentés */
+.pill { display: flex; background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 2px; gap: 2px; }
+.pill button { flex: 1; border: 0; background: transparent; color: var(--muted); font: 12px/1 system-ui, sans-serif; padding: 7px 4px; border-radius: 7px; cursor: pointer; transition: background .15s, color .15s; }
+.pill button:hover { color: var(--text); }
+.pill button[aria-pressed="true"] { background: var(--card); color: var(--text); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
 
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            #sidebar { position: fixed; height: 100%; transform: translateX(-100%); }
-            #sidebar.open { transform: translateX(0); }
-            #overlay.open { display: block; }
-            #mobile-nav { display: flex !important; }
-        }
+/* chapitres */
+.chaps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.chaps button { border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 9px; padding: 6px 0 5px; cursor: pointer; font: 600 13px/1.1 system-ui, sans-serif; transition: border-color .15s, background .15s; }
+.chaps button small { display: block; font: 15px/1.2 "Hexagrammes", "Noto Sans Symbols 2", "Segoe UI Symbol", serif; color: var(--muted); margin-top: 2px; }
+.chaps button:hover { border-color: var(--accent); }
+.chaps button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chaps button[aria-pressed="true"] small { color: rgba(255,255,255,.8); }
+#chapTitle { margin: 10px 4px 0; color: var(--text); font-size: 13px; }
+.file { display: inline-block; margin: 6px 4px 0; color: var(--muted); font-size: 12px; cursor: pointer; text-decoration: underline dotted; }
+.file:hover { color: var(--accent); }
+.file input { display: none; }
 
-        /* Bouton Menu Mobile */
-        #mobile-nav { 
-            display: none; position: fixed; bottom: 20px; right: 20px; 
-            background: var(--accent); color: white; border: none; 
-            width: 60px; height: 60px; border-radius: 50%; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4); z-index: 200;
-            justify-content: center; align-items: center; cursor: pointer;
-        }
+/* curseurs */
+.slider { padding: 8px 0 10px; }
+.slider .top { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.slider output { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 4px; margin: 0; cursor: pointer;
+  background: linear-gradient(var(--accent), var(--accent)) 0 / var(--pct, 50%) 100% no-repeat, var(--line); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,.25); }
 
-        /* Le reste du style (Identique v4) */
-        .chapter-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 1rem; background: rgba(0,0,0,0.2); }
-        .chap-btn { background: var(--border); border: 1px solid transparent; color: white; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
-        .chap-btn.active { background: var(--accent); font-weight: bold; }
-        #controls { flex: 1; overflow-y: auto; padding: 1.5rem; scrollbar-width: thin; }
-        .margin-control { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
-        .margin-control label { display: block; font-size: 0.7rem; text-transform: uppercase; color: #64748b; margin-bottom: 8px; }
-        input[type="range"] { width: 100%; accent-color: var(--accent); }
-        #preview-container { flex: 1; background: #fff; position: relative; }
-        #viewer { width: 100%; height: 100%; border: none; }
-        .item-row { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 12px; border-radius: 12px; margin-bottom: 12px; }
-        .label { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent); font-weight: bold; }
-        .switch-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
-        .switch { position: relative; width: 40px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background: #475569; transition: .3s; border-radius: 20px; }
-        input:checked + .slider { background: var(--accent); }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: white; transition: .3s; border-radius: 50%; }
-        input:checked + .slider:before { transform: translateX(20px); }
-        .btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
-        .btn-group button { background: transparent; border: 1px solid var(--border); color: #94a3b8; padding: 8px 2px; border-radius: 6px; font-size: 0.65rem; cursor: pointer; }
-        .btn-group button.active { background: var(--btn-color, var(--accent)); color: white; border-color: white; }
-        .btn-save { background: var(--accent); color: white; border: none; padding: 14px; margin: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-    </style>
+/* sommaire et liens */
+#toc a { display: block; color: var(--text); text-decoration: none; padding: 7px 8px; border-radius: 7px; font-size: 13px; }
+#toc a:hover { background: var(--card); color: var(--accent); }
+.links a { display: block; color: var(--accent); text-decoration: none; padding: 6px 8px; font-size: 13px; }
+.links a:hover { text-decoration: underline; }
+#main { flex: 1; height: 100vh; overflow-y: auto; }
+#doc { max-width: var(--w, 46em); margin: 0 auto; padding: 32px 24px 120px; }
+#doc h1, #doc h2 { font-weight: normal; color: var(--accent); }
+#doc h2 { margin-top: 2.2em; border-bottom: 1px solid var(--line); padding-bottom: .2em; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2em 0; }
+.seg { margin: 1.1em 0; }
+.seg.jing { background: var(--jing-bg); padding: .6em .9em; border-left: 3px solid var(--accent); }
+.seg p { margin: .25em 0; }
+.seg .l-zh { font-family: "Kaiti", "KaiTi", "STKaiti", "Noto Serif CJK TC", serif; font-size: 1.12em; color: var(--c-zh); }
+.seg .l-py { font-style: italic; color: var(--c-py); font-size: .92em; }
+.seg.jing .l-fr { font-weight: bold; }
+details.variante { border: 1px dashed var(--line); border-radius: 6px; margin: 1.5em 0; padding: 0 1em; background: var(--panel); }
+details.variante > summary { cursor: pointer; padding: .7em 0; color: var(--muted); font: italic .95em/1.4 system-ui, sans-serif; }
+details.variante > summary::before { content: "↳ "; }
+details.variante[open] > summary { border-bottom: 1px dashed var(--line); margin-bottom: .5em; }
+.callout { border-left: 3px solid var(--muted); padding: .3em .8em; color: var(--muted); }
+.t-sy { font-family: "Hexagrammes", "Noto Sans Symbols 2", "Segoe UI Symbol", serif; color: var(--c-sy); }
+.t-zh { color: var(--c-zh); }
+.t-py { font-style: italic; color: var(--c-py); }
+.t-fr { color: var(--c-fr); }
+body.mono .t-sy, body.mono .t-zh, body.mono .t-py, body.mono .t-fr { color: inherit; }
+.hl-zh .t-zh { background: var(--hl-zh); border-radius: 3px; padding: 0 2px; }
+.hl-py .t-py { background: var(--hl-py); border-radius: 3px; padding: 0 2px; }
+.hl-sy .t-sy { background: var(--hl-sy); border-radius: 3px; padding: 0 2px; }
+.hl-fr .t-fr { background: var(--hl-fr); border-radius: 3px; padding: 0 2px; }
+.big-sy .t-sy { font-size: 1.5em; vertical-align: -0.1em; }
+#daynight { position: fixed; top: 14px; right: 22px; z-index: 15; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--text); display: grid; place-items: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: color .2s, border-color .2s, transform .2s; }
+#daynight:hover { color: var(--accent); border-color: var(--accent); transform: rotate(-12deg); }
+#daynight:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#daynight .sun, .is-dark #daynight .moon { display: none; }
+.is-dark #daynight .sun { display: block; }
+#burger { display: none; position: fixed; right: 16px; bottom: 16px; z-index: 20; width: 52px; height: 52px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; font-size: 22px; }
+#msg { color: var(--muted); font-style: italic; }
+@media (max-width: 800px) {
+  #side { position: fixed; z-index: 10; left: 0; top: 0; transform: translateX(-100%); transition: transform .2s; box-shadow: 0 0 30px rgba(0,0,0,.3); }
+  #side.open { transform: none; }
+  #burger { display: block; }
+  #doc { padding: 20px 16px 100px; }
+}
+</style>
 </head>
 <body>
+<aside id="side">
+  <h2>Chapitre</h2>
+  <div class="chaps" id="chaps" role="group" aria-label="Chapitres"></div>
+  <p id="chapTitle"></p>
+  <label class="file">Ouvrir un fichier .md local…<input type="file" id="file" accept=".md,.txt"></label>
 
-<button id="mobile-nav" onclick="toggleSidebar()">
-    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+  <h2>Lignes des passages</h2>
+  <div class="card">
+    <div class="row"><label for="k-l-zh"><span class="dot" style="background:var(--c-zh)"></span>Chinois original</label><input type="checkbox" class="switch" id="k-l-zh" data-k="l-zh"></div>
+    <div class="row"><label for="k-l-py"><span class="dot" style="background:var(--c-py)"></span>Pinyin intégral</label><input type="checkbox" class="switch" id="k-l-py" data-k="l-py"></div>
+    <div class="row"><label for="k-l-fr"><span class="dot" style="background:var(--c-fr)"></span>Traduction</label><input type="checkbox" class="switch" id="k-l-fr" data-k="l-fr"></div>
+    <div class="row"><label for="k-only-jing">Texte classique seul</label><input type="checkbox" class="switch" id="k-only-jing" data-k="only-jing"></div>
+  </div>
+
+  <h2>Termes dans la traduction</h2>
+  <div class="card">
+    <div class="term">
+      <div class="row"><label for="k-sy"><span class="dot" style="background:var(--c-sy)"></span>Symbole <span class="hint">䷀ ☰</span></label><input type="checkbox" class="switch" id="k-sy" data-k="sy"></div>
+      <div class="pill" data-hl="sy"><button data-v="">Simple</button><button data-v="hl">Surligné</button><button data-v="big">Grand</button></div>
+    </div>
+    <div class="term">
+      <div class="row"><label for="k-zh"><span class="dot" style="background:var(--c-zh)"></span>Caractères</label><input type="checkbox" class="switch" id="k-zh" data-k="zh"></div>
+      <div class="pill" data-hl="zh"><button data-v="">Simple</button><button data-v="hl">Surligné</button></div>
+    </div>
+    <div class="term">
+      <div class="row"><label for="k-py"><span class="dot" style="background:var(--c-py)"></span>Pinyin</label><input type="checkbox" class="switch" id="k-py" data-k="py"></div>
+      <div class="pill" data-hl="py"><button data-v="">Simple</button><button data-v="hl">Surligné</button></div>
+    </div>
+    <div class="term">
+      <div class="row"><label for="k-fr"><span class="dot" style="background:var(--c-fr)"></span>Gloses</label><input type="checkbox" class="switch" id="k-fr" data-k="fr"></div>
+      <div class="pill" data-hl="fr"><button data-v="">Simple</button><button data-v="hl">Surligné</button></div>
+    </div>
+    <div class="row" style="border-top:1px solid var(--line)"><label for="k-mono">Sans couleurs</label><input type="checkbox" class="switch" id="k-mono" data-k="mono"></div>
+  </div>
+
+  <h2>Mise en page</h2>
+  <div class="card">
+    <div class="slider"><div class="top"><label for="width">Largeur du texte</label><output id="widthOut"></output></div><input type="range" id="width" min="30" max="80"></div>
+    <div class="slider"><div class="top"><label for="size">Taille des caractères</label><output id="sizeOut"></output></div><input type="range" id="size" min="13" max="24"></div>
+    <div class="slider"><div class="top">Thème</div><div class="pill" id="theme"><button data-v="">Auto</button><button data-v="light">Clair</button><button data-v="dark">Sombre</button></div></div>
+  </div>
+
+  <h2>Sommaire</h2>
+  <nav id="toc"></nav>
+
+  <h2>Voir aussi</h2>
+  <nav class="links"><a href="./">Présentation du projet</a><a href="_archives/liseuse-v1.html">Ancienne liseuse</a></nav>
+</aside>
+<main id="main"><article id="doc"><p id="msg">Chargement…</p></article></main>
+<button id="burger" aria-label="Menu">☰</button>
+<button id="daynight" type="button" aria-label="Passer en mode nuit" title="Jour / nuit">
+  <svg class="moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+  <svg class="sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg>
 </button>
 
-<div id="overlay" onclick="toggleSidebar()"></div>
-
-<div id="sidebar">
-    <div class="chapter-grid" id="chapterGrid"></div>
-    
-    <div class="margin-control">
-        <label>Marges : <span id="marginVal">15</span>%</label>
-        <input type="range" id="marginSlider" min="0" max="40" value="15" oninput="updateMargins(this.value)">
-    </div>
-
-    <div id="controls">
-        <div id="ui-zh" class="item-row" style="--btn-color: var(--color-zh)">
-            <div class="switch-container">
-                <span class="label">.zh</span>
-                <label class="switch"><input type="checkbox" checked onchange="handleToggle('.zh', this.checked)"><span class="slider"></span></label>
-            </div>
-            <div class="btn-group"><button onclick="setHL('.zh', 'none', this)" class="active">Off</button><button onclick="setHL('.zh', 'gold', this)">Or</button><button onclick="setHL('.zh', 'calligraphy', this)">Kaiti</button></div>
-        </div>
-
-        <div id="ui-pinyin" class="item-row" style="--btn-color: var(--color-pinyin)">
-            <div class="switch-container">
-                <span class="label">.pinyin</span>
-                <label class="switch"><input type="checkbox" checked onchange="handleToggle('.pinyin', this.checked)"><span class="slider"></span></label>
-            </div>
-            <div class="btn-group"><button onclick="setHL('.pinyin', 'none', this)" class="active">Off</button><button onclick="setHL('.pinyin', 'soft', this)">Vert</button><button onclick="setHL('.pinyin', 'italic', this)">Ital.</button></div>
-        </div>
-
-        <div id="ui-hexa" class="item-row" style="--btn-color: var(--color-hexa)">
-            <div class="switch-container">
-                <span class="label">.hexa</span>
-                <label class="switch"><input type="checkbox" checked onchange="handleToggle('.hexa', this.checked)"><span class="slider"></span></label>
-            </div>
-            <div class="btn-group"><button onclick="setHL('.hexa', 'none', this)" class="active">Off</button><button onclick="setHL('.hexa', 'box', this)">Cadre</button><button onclick="setHL('.hexa', 'large', this)">Grand</button></div>
-        </div>
-
-        <div id="ui-tri" class="item-row" style="--btn-color: var(--color-tri)">
-            <div class="switch-container">
-                <span class="label">.tri</span>
-                <label class="switch"><input type="checkbox" checked onchange="handleToggle('.tri', this.checked)"><span class="slider"></span></label>
-            </div>
-            <div class="btn-group"><button onclick="setHL('.tri', 'none', this)" class="active">Off</button><button onclick="setHL('.tri', 'circle', this)">Cercle</button><button onclick="setHL('.tri', 'bold', this)">Gras</button></div>
-        </div>
-
-        <div id="ui-expression" class="item-row" style="--btn-color: var(--color-expr)">
-            <div class="switch-container">
-                <span class="label">.expression</span>
-                <label class="switch"><input type="checkbox" checked onchange="handleToggle('.expression', this.checked)"><span class="slider"></span></label>
-            </div>
-            <div class="btn-group"><button onclick="setHL('.expression', 'none', this)" class="active">Off</button><button onclick="setHL('.expression', 'tint', this)">Fond</button><button onclick="setHL('.expression', 'bracket', this)">Croch.</button></div>
-        </div>
-    </div>
-    <button class="btn-save" onclick="saveFile()">Exporter</button>
-</div>
-
-<div id="preview-container">
-    <iframe id="viewer"></iframe>
-</div>
-
 <script>
-    const viewer = document.getElementById('viewer');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    const chapters = [ '1a', '1b', '2a', '2b', '3a', '3b', '4a', '4b', '5a', '5b', '6a', '6b', '00'];
-    let dynamicStyles = {};
-    let currentMargin = 15;
+const MD_DIR = 'français/markdown/';      // Markdown homogène (voir outils/SYNTAXE.md)
+const CHAPTERS = ['00', '1a', '1b', '2a', '2b', '3a', '3b', '4a'];
+const DEFAULT_CHAPTER = '1a';             // comme l'ancienne liseuse
+const TITLES = {
+  '00': 'Principes méthodologiques', '1a': '䷀ Qián – ䷁ Kūn', '1b': '䷂ Zhūn → ䷋ Pǐ',
+  '2a': '䷌ Tóng rén → ䷓ Guān', '2b': '䷔ Shìkè → ䷝ Lí', '3a': '䷞ Xián → ䷧ Xiè',
+  '3b': '䷨ Sǔn → ䷯ Jǐng', '4a': '䷰ Gé → ䷷ Lǚ'
+};
+const DEFAULTS = { 'l-zh': true, 'l-py': true, 'l-fr': true, 'only-jing': false,
+                   sy: true, zh: true, py: true, fr: true, mono: false,
+                   hl: { sy: '', zh: '', py: '', fr: '' }, width: 46, size: 17, theme: '' };
+let S = load();
+let blocks = [];
 
-    // Toggle Sidebar Mobile
-    function toggleSidebar() {
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('open');
-    }
-
-    // Génération chapitres
-    const grid = document.getElementById('chapterGrid');
-    chapters.forEach(id => {
-        const btn = document.createElement('button');
-        btn.className = 'chap-btn';
-        btn.textContent = id;
-        btn.onclick = () => {
-            loadContent(`https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/français/html-balises/${id}tag.html`, btn);
-            if(window.innerWidth <= 768) toggleSidebar(); // Ferme le menu sur mobile après clic
-        };
-        grid.appendChild(btn);
-    });
-
-    window.onload = () => {
-        const params = new URLSearchParams(window.location.search);
-        const postUrl = params.get('post');
-        postUrl ? loadContent(postUrl) : grid.firstChild.click();
-    };
-
-    async function loadContent(url, btn = null) {
-        if (btn) {
-            document.querySelectorAll('.chap-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
-        try {
-            const r = await fetch(url);
-            viewer.srcdoc = await r.text();
-            viewer.onload = () => {
-                const doc = viewer.contentDocument;
-                const s = doc.createElement('style'); s.id = 'dynamic-styles'; doc.head.appendChild(s);
-                updateMargins(currentMargin);
-                updateDocStyles();
-            };
-        } catch (e) { console.error(e); }
-    }
-
-    function updateMargins(val) {
-        currentMargin = val;
-        document.getElementById('marginVal').textContent = val;
-        if (viewer.contentDocument?.body) {
-            viewer.contentDocument.body.style.paddingLeft = `${val}%`;
-            viewer.contentDocument.body.style.paddingRight = `${val}%`;
-        }
-    }
-
-    // Styles & Logique Parenthèses (Identique v4)
-    const CUSTOM_HIGHLIGHTS = {
-        '.zh': { gold: "color: #b45309 !important; background: #fef3c7 !important; padding: 0 4px; border-radius: 4px;", calligraphy: "font-family: 'Kaiti', serif !important; font-size: 1.2em;" },
-        '.pinyin': { soft: "background: #d1fae5 !important; color: #065f46 !important; padding: 0 4px;", italic: "font-style: italic; border-bottom: 2px solid #10b981;" },
-        '.hexa': { box: "border: 2px solid #f472b6 !important; padding: 4px; border-radius: 6px;", large: "font-size: 2.5em; vertical-align: middle;" },
-        '.tri': { circle: "background: #dbeafe !important; border-radius: 50%; padding: 4px 10px;", bold: "font-weight: 900; color: #1e40af !important;" },
-        '.expression': { tint: "background: #ffedd5 !important; padding: 0 6px;", bracket: "border-left: 4px solid #f97316; border-right: 4px solid #f97316; padding: 0 8px;" }
-    };
-
-    function handleToggle(selector, isVisible) {
-        const doc = viewer.contentDocument;
-        const reOpen = /([\(《])\s*$/; const reClose = /^\s*([\拍》])/;
-        doc.querySelectorAll(selector).forEach(el => {
-            const prev = el.previousSibling, next = el.nextSibling;
-            if (!isVisible) {
-                if (prev?.nodeType === 3 && next?.nodeType === 3) {
-                    const mP = prev.textContent.match(reOpen), mN = next.textContent.match(reClose);
-                    if (mP && mN) {
-                        el.dataset.fullPrev = prev.textContent; el.dataset.fullNext = next.textContent;
-                        prev.textContent = prev.textContent.replace(reOpen, ""); next.textContent = next.textContent.replace(reClose, "");
-                    }
-                }
-            } else if (el.dataset.fullPrev) {
-                prev.textContent = el.dataset.fullPrev; next.textContent = el.dataset.fullNext;
-                delete el.dataset.fullPrev; delete el.dataset.fullNext;
-            }
-        });
-        dynamicStyles[selector] = (dynamicStyles[selector] || "").replace("display: none !important;", "");
-        if (!isVisible) dynamicStyles[selector] += "display: none !important;";
-        updateDocStyles();
-    }
-
-    function setHL(selector, type, btn) {
-        btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const isHidden = (dynamicStyles[selector] || "").includes("display: none");
-        dynamicStyles[selector] = isHidden ? "display: none !important;" : "";
-        if (type !== 'none') dynamicStyles[selector] += CUSTOM_HIGHLIGHTS[selector][type];
-        updateDocStyles();
-    }
-
-    function updateDocStyles() {
-        const s = viewer.contentDocument?.getElementById('dynamic-styles');
-        if (s) s.textContent = Object.entries(dynamicStyles).map(([sel, css]) => `${sel} { ${css} }`).join('\n');
-    }
-
-    function saveFile() {
-    // 1. On récupère le document entier de l'iframe
-    const sourceDoc = viewer.contentDocument;
-    if (!sourceDoc) return;
-
-    // 2. On clone l'élément racine (html)
-    const cloneHtml = sourceDoc.documentElement.cloneNode(true);
-    
-    // 3. On cible le body et le head à l'intérieur du clone
-    const bodyClone = cloneHtml.querySelector('body');
-    const headClone = cloneHtml.querySelector('head');
-    const dynamicStyleSource = sourceDoc.getElementById('dynamic-styles');
-
-    if (bodyClone) {
-        // Appliquer les marges actuelles en dur
-        bodyClone.style.paddingLeft = `${currentMargin}%`;
-        bodyClone.style.paddingRight = `${currentMargin}%`;
-    }
-
-    if (dynamicStyleSource && headClone) {
-        // Créer une balise style propre avec les règles accumulées
-        const finalStyleTag = document.createElement('style');
-        finalStyleTag.textContent = dynamicStyleSource.textContent;
-        headClone.appendChild(finalStyleTag);
-        
-        // Supprimer l'ancienne balise id "dynamic-styles" pour l'export
-        const oldStyle = cloneHtml.querySelector('#dynamic-styles');
-        if (oldStyle) oldStyle.remove();
-    }
-
-    // 4. Génération du fichier
-    const blob = new Blob(['<!DOCTYPE html>\n' + cloneHtml.outerHTML], {type: 'text/html'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = "zhouyi_export_final.html";
-    document.body.appendChild(a); // Nécessaire pour certains navigateurs
-    a.click();
-    document.body.removeChild(a);
+function load() {
+  try { return Object.assign(structuredClone(DEFAULTS), JSON.parse(localStorage.getItem('liseuse-nz') || '{}')); }
+  catch (e) { return structuredClone(DEFAULTS); }
 }
+function save() { try { localStorage.setItem('liseuse-nz', JSON.stringify(S)); } catch (e) {} }
+
+/* ---------- analyse du Markdown homogène ---------- */
+function parse(md) {
+  const out = [], lines = md.replace(/\r\n/g, '\n').split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    let m;
+    if ((m = l.match(/^:::\s*(\w+)/))) {
+      const seg = { type: 'seg', kind: m[1], rows: [] };
+      while (++i < lines.length && !/^:::\s*$/.test(lines[i])) {
+        const r = lines[i].match(/^(zh|py|fr):\s?(.*)$/);
+        if (r) seg.rows.push([r[1], r[2]]);
+      }
+      out.push(seg);
+    } else if ((m = l.match(/^\+\+\+\s*variante\s*(.*)$/))) out.push({ type: 'var-open', text: m[1] || 'Autre version' });
+    else if (/^\+\+\+\s*$/.test(l)) out.push({ type: 'var-close' });
+    else if ((m = l.match(/^(#{1,6})\s+(.*)$/))) out.push({ type: 'h', level: m[1].length, text: m[2] });
+    else if (/^---+\s*$/.test(l)) out.push({ type: 'hr' });
+    else if (/^>/.test(l)) out.push({ type: 'callout', text: l.replace(/^>\s?(\[![^\]]*\]\s*)?/, '') });
+    else if (l.trim() && !/^<!--/.test(l)) out.push({ type: 'p', text: l });
+  }
+  return out;
+}
+
+/* ---------- rendu ---------- */
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function fieldsOf(body) {
+  const f = { sy: '', zh: '', py: '', fr: '' };
+  body.split(' | ').forEach(p => { const k = p.slice(0, 2); if (k in f && p[2] === ':') f[k] = p.slice(3); });
+  return f;
+}
+function spans(f, keys) {
+  return keys.filter(k => f[k]).map(k => `<span class="t-${k}">${esc(f[k])}</span>`).join(' ');
+}
+const ORDER = ['sy', 'zh', 'py', 'fr'];
+function inline(text) {
+  const parts = [];
+  text = text.replace(/\{\{([^{}]*)\}\}|\{([^{}]*)\}/g, (m, term, ann) => {
+    const f = fieldsOf(term ?? ann);
+    let html;
+    if (term !== undefined) {
+      let keys = ORDER.filter(k => S[k] && f[k] && k !== 'fr');
+      if (!keys.length) keys = ['py', 'zh', 'sy'].filter(k => f[k]).slice(0, 1);
+      html = `<span class="term">${spans(f, keys)}</span>`;
+    } else {
+      const keys = ORDER.filter(k => S[k] && f[k]);
+      html = keys.length ? ` <span class="ann">(${spans(f, keys).replace(/<\/span> <span class="t-fr">/, '</span>, <span class="t-fr">')})</span>` : '';
+    }
+    parts.push(html);
+    return '\u0000' + (parts.length - 1) + '\u0000';
+  });
+  text = esc(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
+  return text.replace(/\s*\u0000(\d+)\u0000/g, (m, n) => (m.startsWith(' ') || parts[n].startsWith(' ') ? '' : '') + parts[n])
+             .replace(/ +(<span class="ann">)/g, ' $1').replace(/\( /g, '(');
+}
+
+function render() {
+  const doc = document.getElementById('doc'), toc = document.getElementById('toc');
+  let html = '', tocHtml = '', n = 0, inVar = false;
+  for (const b of blocks) {
+    if (b.type === 'h') {
+      const id = 'h' + (n++);
+      html += `<h${b.level} id="${id}">${inline(b.text)}</h${b.level}>`;
+      if (b.level <= 3 && !inVar) tocHtml += `<a href="#${id}">${inline(b.text)}</a>`;
+    } else if (b.type === 'var-open') { html += `<details class="variante"><summary>${inline(b.text)}</summary>`; inVar = true; }
+    else if (b.type === 'var-close') { if (inVar) html += '</details>'; inVar = false; }
+    else if (b.type === 'hr') html += '<hr>';
+    else if (b.type === 'callout') html += `<p class="callout">${inline(b.text)}</p>`;
+    else if (b.type === 'p') html += `<p>${inline(b.text)}</p>`;
+    else if (b.type === 'seg') {
+      if (S['only-jing'] && b.kind !== 'jing') continue;
+      let rows = '';
+      for (const [k, v] of b.rows) {
+        if (!S['l-' + k]) continue;
+        rows += `<p class="l-${k}">${k === 'fr' ? inline(v) : esc(v)}</p>`;
+      }
+      if (rows) html += `<section class="seg ${b.kind}">${rows}</section>`;
+    }
+  }
+  doc.innerHTML = html || '<p id="msg">Rien à afficher avec ces réglages.</p>';
+  toc.innerHTML = tocHtml;
+}
+
+function applyLook() {
+  const c = document.body.classList;
+  c.toggle('mono', S.mono);
+  for (const k of ['sy', 'zh', 'py', 'fr']) c.toggle('hl-' + k, S.hl[k] === 'hl');
+  c.toggle('big-sy', S.hl.sy === 'big');
+  document.documentElement.style.setProperty('--w', S.width + 'em');
+  document.body.style.fontSize = S.size + 'px';
+  if (S.theme) document.documentElement.dataset.theme = S.theme; else delete document.documentElement.dataset.theme;
+  const dark = isDark();
+  document.documentElement.classList.toggle('is-dark', dark);
+  const dn = document.getElementById('daynight');
+  if (dn) dn.setAttribute('aria-label', dark ? 'Passer en mode jour' : 'Passer en mode nuit');
+}
+const darkMQ = matchMedia('(prefers-color-scheme: dark)');
+function isDark() { return S.theme ? S.theme === 'dark' : darkMQ.matches; }
+darkMQ.addEventListener?.('change', () => { if (!S.theme) applyLook(); });
+
+/* ---------- chargement ---------- */
+async function loadChapter(id) {
+  document.getElementById('doc').innerHTML = '<p id="msg">Chargement…</p>';
+  try {
+    const r = await fetch(`${MD_DIR}${id}.md`);
+    if (!r.ok) throw new Error(r.status);
+    blocks = parse(await r.text());
+    render();
+    document.getElementById('main').scrollTop = 0;
+  } catch (e) {
+    document.getElementById('doc').innerHTML =
+      '<p id="msg">Impossible de lire ' + MD_DIR + id + '.md (' + esc(String(e.message || e)) +
+      '). Ouvrez la page via un serveur web, ou choisissez le fichier avec « ouvrir un fichier ».</p>';
+  }
+}
+
+/* ---------- interface ---------- */
+let current = null;
+const chapsEl = document.getElementById('chaps');
+function selectChapter(id, push = true) {
+  current = id;
+  chapsEl.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.id === id));
+  document.getElementById('chapTitle').textContent = TITLES[id] || '';
+  if (push) history.replaceState(null, '', '?ch=' + id);
+  loadChapter(id);
+}
+CHAPTERS.forEach(c => {
+  const b = document.createElement('button');
+  b.dataset.id = c; b.title = TITLES[c] || c;
+  b.innerHTML = `${c}<small>${(TITLES[c] || '').match(/[䷀-䷿]/)?.[0] || '·'}</small>`;
+  b.onclick = () => { selectChapter(c); if (innerWidth <= 800) setOpen(false); };
+  chapsEl.appendChild(b);
+});
+document.getElementById('file').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  chapsEl.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', false));
+  document.getElementById('chapTitle').textContent = f.name;
+  blocks = parse(await f.text()); render();
+};
+document.querySelectorAll('input[data-k]').forEach(cb => {
+  cb.checked = S[cb.dataset.k];
+  cb.onchange = () => { S[cb.dataset.k] = cb.checked; save(); applyLook(); render(); syncPills(); };
+});
+function pill(el, value, onPick) {
+  const set = v => el.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v));
+  set(value);
+  el.onclick = e => { const b = e.target.closest('button'); if (!b) return; set(b.dataset.v); onPick(b.dataset.v); };
+  return set;
+}
+document.querySelectorAll('.pill[data-hl]').forEach(el =>
+  pill(el, S.hl[el.dataset.hl] || '', v => { S.hl[el.dataset.hl] = v; save(); applyLook(); }));
+function syncPills() {   // style inutile quand le champ est masqué
+  document.querySelectorAll('.pill[data-hl]').forEach(el => el.style.opacity = S[el.dataset.hl] ? 1 : .45);
+}
+syncPills();
+for (const [id, unit] of [['width', ' em'], ['size', ' px']]) {
+  const el = document.getElementById(id), out = document.getElementById(id + 'Out');
+  const show = () => { out.textContent = el.value + unit; el.style.setProperty('--pct', (el.value - el.min) / (el.max - el.min) * 100 + '%'); };
+  el.value = S[id]; show();
+  el.oninput = () => { S[id] = +el.value; save(); applyLook(); show(); };
+}
+const setThemePill = pill(document.getElementById('theme'), S.theme, v => { S.theme = v; save(); applyLook(); });
+document.getElementById('daynight').onclick = () => {
+  S.theme = isDark() ? 'light' : 'dark';
+  save(); applyLook(); setThemePill(S.theme);
+};
+const side = document.getElementById('side');
+const burger = document.getElementById('burger');
+const setOpen = o => { side.classList.toggle('open', o); burger.textContent = o ? '✕' : '☰'; };
+burger.onclick = () => setOpen(!side.classList.contains('open'));
+document.getElementById('main').addEventListener('click', () => { if (side.classList.contains('open')) setOpen(false); });
+document.getElementById('toc').onclick = e => { if (e.target.closest('a') && innerWidth <= 800) setOpen(false); };
+
+applyLook();
+/* Liens publies avec l'ancienne liseuse :
+   liseuse.html?post=https://…/français/html-balises/1atag.html  ->  chapitre 1a */
+function startChapter() {
+  const q = new URLSearchParams(location.search);
+  let id = q.get('ch');
+  const post = q.get('post');
+  if (!id && post) {
+    const m = decodeURIComponent(post).match(/([0-9]{1,2}[ab]?)(?:tag)?\.(?:html|md)\s*$/i);
+    if (m) id = m[1].replace(/^0(?=\d[ab])/, '');
+  }
+  return CHAPTERS.includes(id) ? id : DEFAULT_CHAPTER;
+}
+selectChapter(startChapter(), false);
 </script>
 </body>
 </html>

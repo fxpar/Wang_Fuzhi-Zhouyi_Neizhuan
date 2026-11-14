@@ -1,0 +1,17 @@
+Source : _archives/markdown-v1/2a.md
+Sortie : français/markdown/2a.md
+
+annotation                 362
+annotation_avec_glose      20
+etiquette_comm             134
+etiquette_jing             8
+fusion_py                  25
+ligne_fr                   703
+ligne_py                   138
+segment_comm               542
+segment_jing               138
+segment_note               17
+terme                      50
+terme_zh                   11
+
+Cas a verifier (0)

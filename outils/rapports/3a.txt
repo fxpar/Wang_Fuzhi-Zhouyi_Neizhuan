@@ -1,0 +1,27 @@
+Source : _archives/markdown-v1/3a.md
+Sortie : français/markdown/3a.md
+
+annotation                 3880
+annotation_avec_glose      1
+fusion_py                  1
+ligne_fr                   1072
+ligne_py                   173
+segment_comm               724
+segment_jing               164
+segment_note               48
+terme                      234
+terme_zh                   6
+terme_zh_py                3
+
+Cas a verifier (11)
+ligne   140  pinyin sans ton          {sy:☷ | py:Terre}
+ligne  1064  pinyin sans ton          {sy:☷ | py:Terre}
+ligne  1068  pinyin sans ton          {sy:☲ | py:Feu}
+ligne  1228  pinyin sans ton          {sy:☲ | py:Feu}
+ligne  1251  pinyin sans ton          {sy:☲ | py:Feu}
+ligne  1278  pinyin sans ton          {sy:☷ | py:Terre}
+ligne  1310  pinyin sans ton          {sy:☷ | py:Terre}
+ligne  1363  pinyin sans ton          {sy:☷ | py:Terre}
+ligne  1420  pinyin sans ton          {sy:☷ | py:Terre}
+ligne  2147  pinyin sans ton          {sy:☵ | py:Eau}
+ligne  2380  pinyin sans ton          {sy:☵ | py:Eau}

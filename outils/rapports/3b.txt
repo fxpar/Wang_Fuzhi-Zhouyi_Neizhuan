@@ -1,0 +1,20 @@
+Source : _archives/markdown-v1/3b.md
+Sortie : français/markdown/3b.md
+
+annotation                 8103
+annotation_avec_glose      8
+etiquette_comm             22
+etiquette_fr               1
+etiquette_jing             1
+fusion_py                  16
+fusion_termes              1
+ligne_fr                   750
+ligne_py                   611
+segment_comm               513
+segment_jing               128
+segment_note               102
+terme                      39
+terme_zh                   77
+variante                   1
+
+Cas a verifier (0)

@@ -1,0 +1,15 @@
+Source : _archives/markdown-v1/2b.md
+Sortie : français/markdown/2b.md
+
+annotation                 34
+annotation_avec_glose      1
+fusion_py                  447
+ligne_fr                   374
+ligne_py                   176
+segment_comm               189
+segment_jing               177
+segment_note               8
+terme                      179
+terme_zh                   400
+
+Cas a verifier (0)

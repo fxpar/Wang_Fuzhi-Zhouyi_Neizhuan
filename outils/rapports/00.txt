@@ -1,0 +1,16 @@
+Source : _archives/markdown-v1/00.md
+Sortie : français/markdown/00.md
+
+annotation                 492
+fusion_py                  190
+ligne_fr                   365
+segment_comm               40
+segment_jing               25
+segment_note               265
+terme                      291
+terme_zh                   318
+terme_zh_py                1
+
+Cas a verifier (2)
+ligne   276  pinyin sans ton          {zh:氐 | py:Dĭ}
+ligne   304  pinyin sans ton          {zh:氐 | py:Dĭ}

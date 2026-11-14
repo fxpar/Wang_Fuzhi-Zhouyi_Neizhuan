@@ -1,0 +1,21 @@
+Source : _archives/markdown-v1/1b.md
+Sortie : français/markdown/1b.md
+
+annotation                 301
+annotation_avec_glose      7
+etiquette_comm             167
+etiquette_fr               160
+etiquette_jing             167
+etiquette_py               151
+fusion_py                  167
+ligne_fr                   356
+ligne_py                   167
+segment_comm               167
+segment_jing               169
+segment_note               19
+terme                      182
+terme_zh                   514
+terme_zh_py                123
+
+Cas a verifier (1)
+ligne   105  pinyin sans ton          {zh:坎 | py:le Danger}
