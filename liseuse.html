@@ -113,6 +113,27 @@ body.mono .t-sy, body.mono .t-zh, body.mono .t-py, body.mono .t-fr { color: inhe
 #daynight:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 #daynight .sun, .is-dark #daynight .moon { display: none; }
 .is-dark #daynight .sun { display: block; }
+/* prononciation : voix et bulle de pinyin */
+.voices { display: flex; flex-direction: column; gap: 4px; }
+.voices button { text-align: left; border: 1px solid var(--line); background: var(--bg); color: var(--text); border-radius: 8px; padding: 7px 10px; font: 13px/1.25 system-ui, sans-serif; cursor: pointer; }
+.voices button small { color: var(--muted); }
+.voices button[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+#voicesNote { margin: 6px 0 0; }
+#voicesNote:empty { display: none; }
+#bulle { position: fixed; z-index: 30; max-width: min(92vw, 520px); background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,.18); padding: 10px 12px 8px; font: 13px/1.35 system-ui, sans-serif; }
+#bulle[hidden] { display: none; }
+.b-chars { display: flex; flex-wrap: wrap; gap: 4px; }
+.b-c { border: 0; background: transparent; color: inherit; border-radius: 8px; padding: 4px 6px 3px; cursor: pointer; display: flex; flex-direction: column; align-items: center; min-width: 2.6em; }
+.b-c:hover, .b-c:focus-visible { background: var(--bg); outline: none; }
+.b-py { color: var(--c-py); font-weight: 600; font-size: 13px; }
+.b-zh { font: 26px/1.2 "Kaiti", "KaiTi", "STKaiti", "Noto Serif CJK TC", serif; color: var(--c-zh); }
+.b-alt { color: var(--muted); font-size: 10.5px; max-width: 7em; text-align: center; }
+.b-trad { margin: 6px 4px 0; color: var(--muted); }
+.b-trad i { color: var(--c-py); }
+.b-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--line); }
+.b-say { border: 0; background: var(--accent); color: #fff; border-radius: 999px; padding: 6px 14px; font: 600 12px/1 system-ui, sans-serif; cursor: pointer; }
+.b-say:disabled { opacity: .45; cursor: default; }
+.b-foot .hint { font-size: 11.5px; }
 #burger { display: none; position: fixed; right: 16px; bottom: 16px; z-index: 20; width: 52px; height: 52px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; font-size: 22px; }
 #msg { color: var(--muted); font-style: italic; }
 @media (max-width: 800px) {
@@ -159,6 +180,17 @@ body.mono .t-sy, body.mono .t-zh, body.mono .t-py, body.mono .t-fr { color: inhe
     <div class="row" style="border-top:1px solid var(--line)"><label for="k-mono">Sans couleurs</label><input type="checkbox" class="switch" id="k-mono" data-k="mono"></div>
   </div>
 
+  <h2>Prononciation</h2>
+  <div class="card">
+    <div class="row"><label for="k-bulle">Pinyin des caractères sélectionnés</label><input type="checkbox" class="switch" id="k-bulle" data-k="bulle"></div>
+    <div class="slider" style="border-top:1px solid var(--line)">
+      <div class="top">Voix <span class="hint">sur cet appareil</span></div>
+      <div class="voices" id="voices"></div>
+      <p class="hint" id="voicesNote"></p>
+    </div>
+    <div class="slider"><div class="top"><label for="debit">Débit de lecture</label><output id="debitOut"></output></div><input type="range" id="debit" min="0.5" max="1.3" step="0.1"></div>
+  </div>
+
   <h2>Mise en page</h2>
   <div class="card">
     <div class="slider"><div class="top"><label for="width">Largeur du texte</label><output id="widthOut"></output></div><input type="range" id="width" min="30" max="80"></div>
@@ -178,6 +210,7 @@ body.mono .t-sy, body.mono .t-zh, body.mono .t-py, body.mono .t-fr { color: inhe
   <svg class="moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
   <svg class="sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg>
 </button>
+<div id="bulle" role="dialog" aria-label="Prononciation de la sélection" hidden></div>
 
 <script>
 const MD_DIR = 'français/markdown/';      // Markdown homogène (voir outils/SYNTAXE.md)
@@ -190,7 +223,8 @@ const TITLES = {
 };
 const DEFAULTS = { 'l-zh': true, 'l-py': true, 'l-fr': true, 'only-jing': false,
                    sy: true, zh: true, py: true, fr: true, mono: false,
-                   hl: { sy: '', zh: '', py: '', fr: '' }, width: 46, size: 17, theme: '' };
+                   hl: { sy: '', zh: '', py: '', fr: '' }, width: 46, size: 17, theme: '',
+                   bulle: true, voix: '', debit: 0.8 };
 let S = load();
 let blocks = [];
 
@@ -202,6 +236,7 @@ function save() { try { localStorage.setItem('liseuse-nz', JSON.stringify(S)); }
 
 /* ---------- analyse du Markdown homogène ---------- */
 function parse(md) {
+  collectTerms(md);
   const out = [], lines = md.replace(/\r\n/g, '\n').split('\n');
   for (let i = 0; i < lines.length; i++) {
     const l = lines[i];
@@ -354,7 +389,7 @@ function syncPills() {   // style inutile quand le champ est masqué
   document.querySelectorAll('.pill[data-hl]').forEach(el => el.style.opacity = S[el.dataset.hl] ? 1 : .45);
 }
 syncPills();
-for (const [id, unit] of [['width', ' em'], ['size', ' px']]) {
+for (const [id, unit] of [['width', ' em'], ['size', ' px'], ['debit', ' ×']]) {
   const el = document.getElementById(id), out = document.getElementById(id + 'Out');
   const show = () => { out.textContent = el.value + unit; el.style.setProperty('--pct', (el.value - el.min) / (el.max - el.min) * 100 + '%'); };
   el.value = S[id]; show();
@@ -373,6 +408,114 @@ document.getElementById('main').addEventListener('click', () => { if (side.class
 document.getElementById('toc').onclick = e => { if (e.target.closest('a') && innerWidth <= 800) setOpen(false); };
 
 applyLook();
+/* ---------- prononciation : pinyin à la sélection, voix locales ----------
+   Tout reste dans le navigateur : la table donnees/pinyin.json est servie avec la liseuse
+   (base Unihan, voir donnees/LISEZMOI.md) et seules les voix installées sur l'appareil
+   (localService) sont proposées : aucune voix « en ligne » qui enverrait le texte ailleurs. */
+const PY = {};
+fetch('donnees/pinyin.json').then(r => r.ok ? r.json() : {}).then(t => Object.assign(PY, t)).catch(() => {});
+const HANRE = /[㐀-䶿一-鿿豈-﫿\u{20000}-\u{3134f}]/u;
+let terms = new Map();          // caractères -> pinyin choisi par la traduction (chapitre courant)
+function collectTerms(md) {
+  terms = new Map();
+  for (const m of md.matchAll(/\{\{?([^{}]*)\}\}?/g)) {
+    const f = fieldsOf(m[1]);
+    const zh = (f.zh || '').replace(/[《》「」]/g, '');
+    if (zh && f.py && !terms.has(zh)) terms.set(zh, f.py);
+  }
+}
+
+let voices = [], onlineVoices = 0;
+const hasTTS = 'speechSynthesis' in window;
+function loadVoices() {
+  const all = hasTTS ? speechSynthesis.getVoices() : [];
+  const zh = all.filter(v => /^(zh|cmn)/i.test(v.lang));
+  voices = zh.filter(v => v.localService);
+  onlineVoices = zh.length - voices.length;
+  renderVoices();
+}
+function currentVoice() {
+  return voices.find(v => v.name === S.voix) || voices.find(v => /CN|Hans/i.test(v.lang)) || voices[0] || null;
+}
+function voiceLabel(v) {
+  const lang = /HK/i.test(v.lang) ? 'cantonais, Hong Kong' : /TW|Hant/i.test(v.lang) ? 'mandarin, Taïwan' : 'mandarin';
+  return `${esc(v.name.replace(/^Microsoft\s+|\s*-\s*Chinese.*$/g, ''))} <small>${lang}</small>`;
+}
+function renderVoices() {
+  const box = document.getElementById('voices'), note = document.getElementById('voicesNote');
+  const cur = currentVoice();
+  box.innerHTML = voices.map(v => `<button data-name="${esc(v.name)}" aria-pressed="${v === cur}">${voiceLabel(v)}</button>`).join('');
+  let msg = '';
+  if (!hasTTS) msg = 'Ce navigateur ne propose pas de synthèse vocale.';
+  else if (!voices.length) msg = 'Aucune voix chinoise installée sur cet appareil. Sous Windows : Paramètres → Heure et langue → Langue et région → ajouter « Chinois (simplifié, Chine) » avec l’option Voix. Sous macOS : Réglages → Accessibilité → Contenu énoncé → Voix du système.';
+  if (onlineVoices) msg += (msg ? ' ' : '') + `${onlineVoices} voix « en ligne » ignorée${onlineVoices > 1 ? 's' : ''} : elles enverraient le texte à un service extérieur.`;
+  note.textContent = msg;
+}
+document.getElementById('voices').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  S.voix = b.dataset.name; save(); renderVoices(); speak('乾元亨利貞');
+};
+if (hasTTS) { loadVoices(); speechSynthesis.addEventListener?.('voiceschanged', loadVoices); }
+else renderVoices();
+
+function speak(text) {
+  const v = currentVoice();
+  if (!v || !text) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.voice = v; u.lang = v.lang; u.rate = S.debit;
+  speechSynthesis.speak(u);
+}
+
+const bulle = document.getElementById('bulle');
+let bulleText = '';
+function hideBulle() { bulle.hidden = true; bulleText = ''; }
+function showBulle(text, rect) {
+  const chars = [...text].filter(c => HANRE.test(c)).slice(0, 40);
+  if (!chars.length) return hideBulle();
+  bulleText = chars.join('');
+  const cells = chars.map(c => {
+    const r = (PY[c] || '').split(' ').filter(Boolean);
+    return `<button class="b-c" data-c="${c}" title="Écouter ${c}"><span class="b-py">${esc(r[0] || '?')}</span>` +
+           `<span class="b-zh">${c}</span>${r.length > 1 ? `<span class="b-alt">${esc(r.slice(1).join(' · '))}</span>` : ''}</button>`;
+  }).join('');
+  const trad = terms.get(bulleText);
+  const v = currentVoice();
+  bulle.innerHTML = `<div class="b-chars">${cells}</div>` +
+    (trad ? `<p class="b-trad">Lecture retenue dans la traduction : <i>${esc(trad)}</i></p>` : '') +
+    `<div class="b-foot"><span class="hint">${chars.length > 1 ? 'Cliquez un caractère pour l’entendre seul' : 'Lectures possibles sous le caractère'}</span>` +
+    `<button class="b-say" ${v ? '' : 'disabled title="Aucune voix chinoise locale"'}>🔊 Écouter</button></div>`;
+  bulle.hidden = false;
+  const w = bulle.offsetWidth, h = bulle.offsetHeight;
+  let left = rect.left + rect.width / 2 - w / 2;
+  left = Math.max(8, Math.min(left, innerWidth - w - 8));
+  let top = rect.top - h - 10;
+  if (top < 8) top = rect.bottom + 10;
+  bulle.style.left = left + 'px'; bulle.style.top = Math.min(top, innerHeight - h - 8) + 'px';
+}
+bulle.addEventListener('mousedown', e => e.preventDefault());   // garder la sélection
+bulle.onclick = e => {
+  const c = e.target.closest('.b-c');
+  if (c) return speak(c.dataset.c);
+  if (e.target.closest('.b-say')) speak(bulleText);
+};
+let selTimer;
+document.addEventListener('selectionchange', () => {
+  clearTimeout(selTimer);
+  selTimer = setTimeout(() => {
+    if (!S.bulle) return hideBulle();
+    const sel = getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) return hideBulle();
+    const range = sel.getRangeAt(0);
+    if (!document.getElementById('doc').contains(range.commonAncestorContainer)) return hideBulle();
+    const text = sel.toString();
+    if (text === bulleText && !bulle.hidden) return;
+    showBulle(text, range.getBoundingClientRect());
+  }, 220);
+});
+document.getElementById('main').addEventListener('scroll', hideBulle, { passive: true });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') hideBulle(); });
+
 /* Liens publies avec l'ancienne liseuse :
    liseuse.html?post=https://…/français/html-balises/1atag.html  ->  chapitre 1a */
 function startChapter() {

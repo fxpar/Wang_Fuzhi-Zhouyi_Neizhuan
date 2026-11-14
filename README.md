@@ -26,6 +26,8 @@ Hegragrammes.ttf est un sous groupe d'élément construit à partir de Noto Sans
 
 La [liseuse](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/liseuse.html) lit directement le texte homogène de `français/markdown/`. Elle permet d'afficher ou de masquer le chinois original, le pinyin intégral et la traduction ; dans la traduction, les symboles (hexagrammes, trigrammes), les caractères, le pinyin et les gloses de chaque terme ; de les surligner ; de n'afficher que le texte classique. Les passages traduits deux fois (reprises après un blocage des outils d'IA) sont repliés dans un accordéon.
 
+En sélectionnant des caractères chinois, une bulle affiche leur pinyin et permet de les écouter avec une voix chinoise installée sur l'appareil. Tout se passe dans le navigateur : ni la sélection ni le texte ne sont envoyés à un service extérieur (table de pinyin issue de la base Unihan d'Unicode, voir [donnees/LISEZMOI.md](donnees/LISEZMOI.md)).
+
 Les anciens liens `liseuse.html?post=…/html-balises/1atag.html` restent valides : ils ouvrent le chapitre correspondant. Le lien court est `liseuse.html?ch=1a`.
 
 # Format du texte

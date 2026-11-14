@@ -71,6 +71,13 @@ Les liens déjà publiés vers l'ancienne liseuse (`liseuse.html?post=…/html-b
 
 Deux pièges de GitHub Pages (Jekyll) ont été corrigés : les dossiers commençant par `_` ne sont pas publiés sans `_config.yml`, et un fichier Markdown qui commence par `---` est pris pour un en-tête YAML et n'est plus servi tel quel.
 
+## 6. Prononciation : pinyin à la sélection et voix chinoise
+
+Ajoutée ensuite, pour apprendre un peu de chinois en lisant. Lire le pinyin d'un texte classique n'a pas grand sens philologique, mais c'est une porte d'entrée.
+
+- **Pinyin à la sélection** : quand on sélectionne des caractères, une bulle affiche le pinyin de chacun. La table `donnees/pinyin.json` (48 Ko, 2 869 caractères, tous ceux du corpus) est extraite de la base Unihan d'Unicode par `generer_pinyin.py`. Elle est servie avec la liseuse : aucune donnée ne sort du navigateur. Pour les 1 339 caractères qui ont plusieurs lectures, toutes sont montrées, la plus courante en premier, sans choix automatique selon le contexte. Si la sélection correspond à un terme annoté dans la traduction, la bulle rappelle la lecture retenue par celle-ci.
+- **Voix** : la synthèse vocale intégrée au navigateur lit la sélection ou un caractère seul. Seules les voix installées sur l'appareil sont proposées. Les voix « en ligne » de Chrome ou d'Edge, qui enverraient le texte à Google ou à Microsoft, sont écartées. Sous Windows, les voix Huihui, Kangkang et Yaoyao s'installent avec le chinois dans les paramètres de langue.
+
 ## Les scripts
 
 | Script | Rôle |
@@ -83,6 +90,7 @@ Deux pièges de GitHub Pages (Jekyll) ont été corrigés : les dossiers commen�
 | `analyse/etiquettes.py` | inventaire des étiquettes en gras |
 | `analyse/marqueurs.sh` | traces de blocage, par numéro de ligne |
 | `analyse/doublons.py` | recouvrement entre zones, pour repérer les doublons |
+| `generer_pinyin.py` | table de pinyin de la liseuse, à partir de la base Unihan |
 
 Pour tout régénérer : `sh outils/tout_convertir.sh`. Prérequis : Python 3, sans bibliothèque externe.
 
