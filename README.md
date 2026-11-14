@@ -32,6 +32,8 @@ Les anciens liens `liseuse.html?post=…/html-balises/1atag.html` restent valide
 
 Depuis novembre 2026, les traductions de `français/markdown/` suivent une syntaxe unique, décrite dans [outils/SYNTAXE.md](outils/SYNTAXE.md) : passages `::: jing` / `::: comm` / `::: note` avec des lignes `zh:` `py:` `fr:`, et termes balisés `{zh:孚 | py:fú}`. Ils sont générés à partir des textes d'origine par `sh outils/tout_convertir.sh` ; les contrôles et cas à vérifier sont dans `outils/rapports/`.
 
+La démarche (mesure de l'hétérogénéité, choix de la syntaxe, conversion, contournement des blocages de modération, détection des doublons) est racontée dans [outils/JOURNAL.md](outils/JOURNAL.md), avec tous les scripts utilisés.
+
 # Archives
 
 `_archives/` conserve les versions précédentes : les textes Markdown d'origine (`markdown-v1/`, source de la conversion) et l'[ancienne liseuse](https://fxpar.github.io/Wang_Fuzhi-Zhouyi_Neizhuan/_archives/liseuse-v1.html). Les pages `français/html-simple/` et `français/html-balises/` restent en place pour les liens existants, mais ne sont plus mises à jour.
